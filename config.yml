@@ -1,0 +1,26 @@
+logging:
+  level: INFO
+  loggers:
+    io.dropwizard.archetypes: DEBUG
+
+swagger:
+  resourcePackage: com.decipherzone.dropwizard.resources
+  uriPrefix: /
+  title: Sample Dropwizard Application API Endpoints
+  description: This is the listing of all the API endpoints of Sample Dropwizard Application back end. It lists resource details, operations supported, access methods and request/response format.
+
+config:
+  appName: Java-Sample
+  appBaseUrl: http://localhost:7070/
+
+server:
+  adminMinThreads: 1
+  adminMaxThreads: 64
+  adminContextPath: /
+  applicationContextPath: /
+  applicationConnectors:
+    - type: http
+      port: 7070
+  adminConnectors:
+    - type: http
+      port: 7071
