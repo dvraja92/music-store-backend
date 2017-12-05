@@ -17,12 +17,12 @@ public class MusicRepositoryImpl extends MongoBaseRepositoryImpl<Music> implemen
 
     @Override
     public List<Music> getRecordByArtistName(String artistName) {
-        Iterable<Music> iterable = coll.find("{artist:#, deleted:false}",artistName).as(entityClazz);
+        Iterable<Music> iterable = coll.find("{artist:#, deleted:false}", artistName).as(entityClazz);
         return Lists.newArrayList(iterable);
     }
 
     @Override
     public Music getRecordByTitle(String titleName) {
-        return coll.findOne("{title:#, deleted:false}",titleName).as(entityClazz);
+        return coll.findOne("{title:#, deleted:false}", titleName).as(entityClazz);
     }
 }

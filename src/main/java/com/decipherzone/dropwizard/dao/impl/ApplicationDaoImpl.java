@@ -3,6 +3,10 @@ package com.decipherzone.dropwizard.dao.impl;
 import com.decipherzone.dropwizard.AppConstants;
 import com.decipherzone.dropwizard.dao.ApplicationDao;
 import com.decipherzone.dropwizard.dao.BaseDao;
+import com.decipherzone.dropwizard.domain.models.Music;
+import com.decipherzone.dropwizard.domain.models.db.MongoDb;
+import com.decipherzone.dropwizard.domain.repositories.MusicRepository;
+import com.decipherzone.dropwizard.domain.repositories.impl.MongoBaseRepositoryImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.mongodb.*;
 import com.mongodb.client.FindIterable;
@@ -19,15 +23,17 @@ import java.util.List;
 import java.util.stream.Stream;
 
 @Singleton
-public class ApplicationDaoImpl implements ApplicationDao, BaseDao<BasicDBObject> {
+public class ApplicationDaoImpl extends MongoBaseRepositoryImpl<Music> implements ApplicationDao {
     private static final Logger LOGGER = LoggerFactory.getLogger(ApplicationDaoImpl.class);
 
-    private MongoClient mongoClient;
+    private MusicRepository musicRepository;
 
     @Inject
-    public ApplicationDaoImpl(MongoClient mongoClient) {
-        this.mongoClient = mongoClient;
+    public ApplicationDaoImpl( MongoDb mongoManager, MusicRepository musicRepository) throws Exception {
+        super(Music.class, mongoManager);
+        this.musicRepository = musicRepository;
     }
+
 
     @Override
     public void loadInitialData() {
@@ -39,24 +45,25 @@ public class ApplicationDaoImpl implements ApplicationDao, BaseDao<BasicDBObject
      * @return
      */
     private boolean loadMusicData(){
-        MongoCollection<BasicDBObject> musicCollection = getCollection(mongoClient, AppConstants.MUSIC_COLLECTION, BasicDBObject.class);
+        List<Music> musicCollection = musicRepository.list();
 
-        if (musicCollection.count() == 0){
-            List<BasicDBObject> musicList = new ArrayList<>();
+        if (musicCollection.size() == 0){
+            List<Music> musicList = new ArrayList<>();
 
             try (Stream<String> stream = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream(AppConstants.MUSIC_FILE))).lines()) {
 
                 stream.forEach((String res) ->{
                     String[] musicDetailsArr = res.split(",");
-                    BasicDBObject music = new BasicDBObject();
-                    music.put("title", musicDetailsArr[0].replaceAll("\"", ""));
-                    music.put("artist", musicDetailsArr[1].replaceAll("\"", ""));
-                    music.put("description", musicDetailsArr[2].replaceAll("\"", ""));
-
+                    Music music = new Music();
+                    music.prepare();
+                    music.setArtist(musicDetailsArr[1].replaceAll("\"", ""));
+                    music.setTitle( musicDetailsArr[0].replaceAll("\"", ""));
+                    music.setDescription(musicDetailsArr[2].replaceAll("\"", ""));
                     musicList.add(music);
                 });
 
-                musicCollection.insertMany(musicList);
+                musicRepository.save(musicList);
+
 
                 return true;
             } catch (Exception e){

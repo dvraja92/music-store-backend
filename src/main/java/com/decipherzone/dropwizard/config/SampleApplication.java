@@ -9,6 +9,7 @@ import com.decipherzone.dropwizard.domain.repositories.MusicRepository;
 import com.decipherzone.dropwizard.domain.repositories.UserRepository;
 import com.decipherzone.dropwizard.domain.repositories.impl.MusicRepositoryImpl;
 import com.decipherzone.dropwizard.domain.repositories.impl.UserRepositoryImpl;
+import com.decipherzone.dropwizard.exceptions.mappers.*;
 import com.decipherzone.dropwizard.health.ApplicationHealthCheck;
 import com.decipherzone.dropwizard.resources.AuthResource;
 import com.decipherzone.dropwizard.resources.MusicResource;
@@ -23,6 +24,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.mongodb.MongoClient;
 import io.dropwizard.Application;
+import io.dropwizard.jersey.errors.EarlyEofExceptionMapper;
 import io.dropwizard.jersey.errors.LoggingExceptionMapper;
 import io.dropwizard.server.DefaultServerFactory;
 import io.dropwizard.setup.Bootstrap;
@@ -72,6 +74,15 @@ class SampleApplication extends Application<ApplicationConfiguration> {
         env.jersey().register(injector.getInstance(AuthResource.class));
         env.healthChecks().register(config.getAppConfig().getAppName(), new ApplicationHealthCheck(config.getAppConfig().getAppName()));
         env.jersey().register(injector.getInstance(AppAuthenticationFilter.class));
+
+        env.jersey().register(new BaseExceptionMapper());
+        env.jersey().register(new JsonProcessingExceptionMapper());
+        env.jersey().register(new BaseConstraintMapper());
+        // restore other default exception mappers
+        env.jersey().register(new EarlyEofExceptionMapper());
+
+        env.jersey().register(new RuntimeExceptionMapper());
+        env.jersey().register(new BaseLoggingExceptionMapper());
 
         ApplicationService instance = injector.getInstance(ApplicationService.class);
         instance.loadInitialData();

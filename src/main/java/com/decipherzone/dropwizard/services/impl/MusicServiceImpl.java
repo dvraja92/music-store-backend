@@ -73,9 +73,9 @@ public class MusicServiceImpl implements MusicService{
         if (!StringUtils.isNotBlank(artistName)){
             throw new InvalidDataException(MUSIC_RECORD,"Artist field is empty");
         }
-
+        StringUtils.trim(artistName);
         List<Music> music = musicRepository.getRecordByArtistName(artistName);
-        if (music == null){
+        if (music == null && music.isEmpty()){
             throw new InvalidDataException(MUSIC_RECORD,"Record not found");
         }
 
