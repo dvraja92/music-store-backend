@@ -60,10 +60,13 @@ class SampleApplication extends Application<ApplicationConfiguration> {
         final FilterRegistration.Dynamic cors = env.servlets().addFilter("CORS", CrossOriginFilter.class);
 
         cors.setInitParameter("allowedOrigins", "*");
-        cors.setInitParameter("allowedHeaders", "X-Requested-With,Content-Type,Accept,Origin");
+        cors.setInitParameter("allowedHeaders", "Content-Type,Authorization,X-Requested-With,Content-Length,Accept,Origin");
         cors.setInitParameter("allowedMethods", "OPTIONS,GET,PUT,POST,DELETE,HEAD");
+        cors.setInitParameter("allowCredentials", "true");
+        cors.setInitParameter("Access-Control-Allow-Credentials", "true");
 
         cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
+
 
         ((DefaultServerFactory) config.getServerFactory()).setRegisterDefaultExceptionMappers(false);
         env.jersey().register(new LoggingExceptionMapper<Throwable>(){});

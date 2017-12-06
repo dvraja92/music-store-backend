@@ -2,6 +2,7 @@ package com.decipherzone.dropwizard.resources;
 
 
 import com.codahale.metrics.annotation.Timed;
+import com.decipherzone.dropwizard.response.APIResponse;
 import com.decipherzone.dropwizard.rest.MusicAddRequest;
 import com.decipherzone.dropwizard.services.MusicService;
 import io.swagger.annotations.Api;
@@ -13,6 +14,7 @@ import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.decipherzone.dropwizard.domain.models.Music;
 
@@ -107,8 +109,11 @@ public class MusicResource {
     @ApiImplicitParams({
             @ApiImplicitParam(name = "Authorization", value = "Authorization token", required = true, dataType = "string", paramType = "header")
     })
-    public void deleteRecord(@PathParam(value = "recordId") String recordId){
+    public APIResponse deleteRecord(@PathParam(value = "recordId") String recordId){
+
         musicService.deleteRecord(recordId);
+        return new APIResponse.ResponseBuilder(Response.Status.OK.getStatusCode(), "success").setMsg("Record deleted successfully").build();
+
     }
 
 }

@@ -32,7 +32,7 @@ public class MusicServiceImpl implements MusicService{
 
     @Override
     public List<Music> getAllRecords() {
-        return musicRepository.list();
+        return musicRepository.listNonDeleted();
     }
 
     @Override
@@ -65,7 +65,7 @@ public class MusicServiceImpl implements MusicService{
         if (dbMusic == null){
             throw new InvalidDataException(MUSIC_RECORD, DATA_NOT_FOUND);
         }
-        musicRepository.removeById(recordId);
+        musicRepository.hardRemoveById(recordId);
     }
 
     @Override
